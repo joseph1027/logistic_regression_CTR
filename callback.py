@@ -105,7 +105,7 @@ def read_test_data():
 def mygenerator(batch_size,data_size):
 	accu=0
 	while True:
-		with open('/data2/train.yzx.txt') as f:
+		with open('/data2/train_mix_1_1_300000.txt') as f:
 			if((accu+batch_size)<data_size):
 				a,b=read_train_data(f,batch_size)
 				accu += batch_size
@@ -130,8 +130,9 @@ class roc_callback(Callback):
 
     def on_epoch_end(self, epoch, logs={}):
         y_pred_val = self.model.predict(self.x_val)
+        #print(y_pred_val)
         roc_val = roc_auc_score(self.y_val, y_pred_val)
-        print(('\rroc-auc_val:'+str(round(roc_val,4))),end=100*' '+'\n')
+        print(('roc-auc_val:'+str(round(roc_val,4))),end=100*' '+'\n')
         return
 
     def on_batch_begin(self, batch, logs={}):
@@ -153,8 +154,8 @@ if __name__ == "__main__":
 
 	model = get_model()
 	early_stopping = EarlyStopping(monitor='val_loss', patience=1, verbose=1, mode='auto')
-	batch_size = 102400
-	data_size = 1000000
+	batch_size = 10240
+	data_size = 600000
 	#cw = compute_weight(data_size)
 	history = model.fit_generator(mygenerator(batch_size,data_size),steps_per_epoch=int(data_size/batch_size)+1,epochs=1000,verbose=1,validation_data=(sm_test,y_test_ca),class_weight=cw,callbacks=[roc_callback(testing_data=(sm_test,y_test_ca)),early_stopping])
 	print(cw)
